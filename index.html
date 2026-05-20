@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-store,no-cache,must-revalidate">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GPT-Image-2 v4</title>
+<style>
+:root{--bg:#0a0a0f;--sf:#111118;--cd:#16161f;--ch:#1c1c28;--bd:#2a2a3a;--bs:#3a3a52;--ac:#6c63ff;--ah:#7d75ff;--a3:#00d4aa;--tx:#e8e8f0;--dm:#a0a0c0;--mt:#7070a0;--wn:#ffb347;--dg:#ff6b6b;--ft:ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;--mn:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--tx);font-family:var(--ft);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(108,99,255,.06) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(0,212,170,.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+.C{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:24px 20px 60px}
+header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--bd);flex-wrap:wrap;gap:8px}
+.logo{font-weight:800;font-size:1.3rem;display:flex;align-items:center;gap:8px}.logo .d{width:9px;height:9px;border-radius:50%;background:var(--ac);box-shadow:0 0 12px var(--ac)}.logo .t{color:var(--ac)}.logo .v{font-size:.55rem;color:var(--mt);font-weight:400;margin-left:4px}
+.gsw{display:flex;background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:3px;font-size:.7rem}.gsw button{padding:5px 10px;border:none;border-radius:5px;background:0;color:var(--mt);cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap}.gsw button.on{background:var(--cd);color:var(--tx);box-shadow:0 0 0 1px var(--bs)}
+.tabs{display:flex;gap:3px;background:var(--sf);border:1px solid var(--bd);border-radius:9px;padding:3px;margin-bottom:14px}.tab{flex:1;padding:8px;text-align:center;cursor:pointer;border-radius:6px;font-weight:600;font-size:.76rem;color:var(--mt);border:none;background:0;font-family:inherit;transition:all .15s}.tab.on{background:var(--cd);color:var(--tx);box-shadow:0 0 0 1px var(--bs)}
+.lay{display:grid;grid-template-columns:370px 1fr;gap:14px;align-items:start}@media(max-width:900px){.lay{grid-template-columns:1fr}}
+.P{background:var(--cd);border:1px solid var(--bd);border-radius:11px;padding:16px;margin-bottom:12px}
+.pt{font-weight:700;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mt);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}.pt .r{font-weight:500;text-transform:none;letter-spacing:0;font-size:.65rem;color:var(--dm)}
+label{display:block;font-size:.64rem;color:var(--mt);margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+input[type="text"],input[type="password"],input[type="number"],textarea,select{width:100%;background:var(--sf);border:1px solid var(--bd);border-radius:6px;color:var(--tx);font-family:var(--mn);font-size:.77rem;padding:8px 10px;outline:none;transition:border-color .15s;margin-bottom:10px}input:focus,textarea:focus,select:focus{border-color:var(--ac)}textarea{resize:vertical;min-height:68px;font-family:var(--ft);line-height:1.5}select option{background:var(--sf)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.ht{font-size:.67rem;margin-bottom:10px;padding:7px 10px;border-radius:5px;line-height:1.4}.ht.i{color:var(--a3);background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2)}.ht.w{color:var(--wn);background:rgba(255,179,71,.08);border:1px solid rgba(255,179,71,.2)}.ht.d{color:var(--dg);background:rgba(255,107,107,.08);border:1px solid rgba(255,107,107,.2)}
+.btn{width:100%;padding:10px;border:none;border-radius:8px;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .15s;font-family:inherit}.bp{background:var(--ac);color:#fff}.bp:hover{background:var(--ah);transform:translateY(-1px)}.bp:disabled{opacity:.4;cursor:not-allowed;transform:none}.bs{background:var(--sf);color:var(--tx);border:1px solid var(--bd)}.bs:hover{background:var(--ch)}.bg{background:0;color:var(--dm);border:none;padding:5px 9px;font-size:.68rem;width:auto}.bg:hover{color:var(--tx);background:var(--sf)}
+.kr{display:flex;gap:6px;margin-bottom:10px}.kr input{margin-bottom:0;flex:1}.kr .btn{width:auto;padding:8px 11px;font-size:.7rem}
+.mp{display:none}.mp.on{display:block}
+.meta{font-size:.65rem;color:var(--dm);line-height:1.6;font-family:var(--mn)}.meta code{color:var(--a3);padding:1px 4px;background:var(--sf);border-radius:3px}
+.ua{border:2px dashed var(--bd);border-radius:8px;padding:16px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:10px;font-size:.73rem;color:var(--mt);background:var(--sf)}.ua:hover,.ua.drag{border-color:var(--ac);color:var(--tx);background:var(--ch)}.ua input{display:none}
+.upw{margin-top:6px;position:relative;display:inline-block}.upw img{max-width:100%;max-height:90px;border-radius:5px;border:1px solid var(--bd)}.upw .rm{position:absolute;top:-5px;right:-5px;background:var(--dg);color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:.75rem;cursor:pointer;line-height:1}
+.op{background:var(--cd);border:1px solid var(--bd);border-radius:11px;padding:16px;min-height:400px;display:flex;flex-direction:column}
+.oph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--mt);gap:10px;text-align:center;padding:24px}.oph svg{opacity:.2}.oph p{font-size:.76rem;line-height:1.5}
+#ra{display:none;flex:1}
+.riw{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--bd);background:var(--sf);margin-bottom:8px}.riw img{width:100%;display:block;cursor:zoom-in}
+.riw .ac{position:absolute;bottom:6px;right:6px;display:flex;gap:4px;opacity:0;transition:opacity .15s}.riw:hover .ac{opacity:1}
+.riw .ac button{background:rgba(10,10,15,.85);color:#fff;border:1px solid var(--bs);border-radius:5px;padding:4px 8px;font-size:.66rem;cursor:pointer;backdrop-filter:blur(6px);font-family:inherit}.riw .ac button:hover{background:var(--ac);border-color:var(--ac)}
+.sp{display:none;align-items:center;justify-content:center;flex:1;flex-direction:column;gap:12px;color:var(--mt);font-size:.76rem;padding:24px}
+.sr{width:36px;height:36px;border:3px solid var(--bd);border-top-color:var(--ac);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.sp .tm{font-size:.68rem;color:var(--dm);font-family:var(--mn)}
+.sb{margin-top:10px;padding:8px 10px;border-radius:6px;font-size:.7rem;display:none;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+.sb.err{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.25);color:#ff9f9f}.sb.ok{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);color:var(--a3)}.sb.inf{background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.25);color:#9d96ff}
+.cd{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}.cc{font-size:.64rem;padding:3px 6px;border-radius:4px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:#9d96ff;font-family:var(--mn)}
+.hs{margin-top:14px}
+.hg{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:6px;max-height:300px;overflow-y:auto}
+.hg::-webkit-scrollbar{width:5px}.hg::-webkit-scrollbar-thumb{background:var(--bs);border-radius:3px}
+.hi{aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--bd);cursor:pointer;position:relative;background:var(--sf);transition:all .15s}.hi:hover{border-color:var(--ac);transform:translateY(-1px)}.hi img{width:100%;height:100%;object-fit:cover}
+.hi .ho{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.85) 0%,transparent 50%);color:#fff;font-size:.58rem;padding:4px;display:flex;flex-direction:column;justify-content:flex-end;opacity:0;transition:opacity .15s;line-height:1.2;pointer-events:none}.hi:hover .ho{opacity:1}
+.hi .fv{position:absolute;top:2px;left:2px;font-size:.65rem;opacity:0;cursor:pointer;background:rgba(0,0,0,.6);border:none;color:#ffb347;border-radius:3px;padding:2px 4px}.hi:hover .fv{opacity:1}.hi .fv.on{opacity:1;color:#ffd700}
+.hi .dl{position:absolute;top:2px;right:2px;background:rgba(255,107,107,.85);color:#fff;border:none;border-radius:3px;width:16px;height:16px;font-size:.65rem;cursor:pointer;opacity:0}.hi:hover .dl{opacity:1}
+.hi .hdl{position:absolute;top:20px;right:2px;background:rgba(108,99,255,.85);color:#fff;border:none;border-radius:3px;width:16px;height:16px;font-size:.6rem;cursor:pointer;opacity:0;line-height:1}.hi:hover .hdl{opacity:1}
+.hi .hpv{position:absolute;top:38px;right:2px;background:rgba(0,212,170,.85);color:#fff;border:none;border-radius:3px;width:16px;height:16px;font-size:.6rem;cursor:pointer;opacity:0;line-height:1}.hi:hover .hpv{opacity:1}
+.he{color:var(--mt);font-size:.74rem;text-align:center;padding:20px}
+.tg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px;max-height:140px;overflow-y:auto}
+.ti{padding:6px 8px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;cursor:pointer;font-size:.66rem;line-height:1.3;transition:all .15s;color:var(--dm)}.ti:hover{border-color:var(--ac);color:var(--tx);background:var(--ch)}.ti .tn{font-weight:600;color:var(--tx);margin-bottom:1px;font-size:.63rem}
+.pr{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.pc{padding:4px 9px;background:var(--sf);border:1px solid var(--bd);border-radius:5px;cursor:pointer;font-size:.64rem;color:var(--dm);font-family:inherit;transition:all .15s}.pc:hover{border-color:var(--ac);color:var(--tx)}.pc.on{border-color:var(--ac);color:var(--ac);background:rgba(108,99,255,.08)}
+.bl{max-height:160px;overflow-y:auto;margin-bottom:8px}
+.bi{display:flex;align-items:center;gap:5px;padding:5px 7px;background:var(--sf);border:1px solid var(--bd);border-radius:4px;margin-bottom:3px;font-size:.68rem}.bi .bt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dm)}.bi .bst{font-size:.6rem;padding:2px 5px;border-radius:3px}
+.bi .bst.p{background:var(--sf);color:var(--mt)}.bi .bst.r{background:rgba(108,99,255,.15);color:var(--ac)}.bi .bst.d{background:rgba(0,212,170,.12);color:var(--a3)}.bi .bst.f{background:rgba(255,107,107,.12);color:var(--dg)}
+.tt{display:inline-flex;align-items:center;gap:3px;font-size:.63rem;color:var(--mt);cursor:pointer;margin-bottom:7px;padding:3px 7px;border-radius:4px;border:1px solid var(--bd);background:var(--sf);transition:all .15s}.tt:hover,.tt.on{color:var(--a3);border-color:var(--a3)}
+.lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;flex-direction:column;gap:10px}.lb.show{display:flex}.lb img{max-width:100%;max-height:76vh;border-radius:6px}
+.lb .la{display:flex;gap:6px}.lb .la button{background:var(--cd);color:#fff;border:1px solid var(--bd);border-radius:6px;padding:7px 14px;font-size:.74rem;cursor:pointer;font-family:inherit}.lb .la button:hover{background:var(--ac);border-color:var(--ac)}
+.lb .cl{position:absolute;top:14px;right:14px;background:var(--cd);color:#fff;border:1px solid var(--bd);border-radius:50%;width:32px;height:32px;font-size:1rem;cursor:pointer}
+.fw{background:linear-gradient(90deg,rgba(255,107,107,.12),rgba(255,179,71,.1));border:1px solid rgba(255,107,107,.3);border-radius:8px;padding:9px 12px;margin-bottom:12px;font-size:.73rem;line-height:1.4;color:#ffb8b8;display:none}.fw strong{color:#fff}.fw code{background:rgba(0,0,0,.3);padding:1px 4px;border-radius:3px;color:var(--a3);font-family:var(--mn)}
+</style>
+</head>
+<body>
+<div class="C">
+<div class="fw" id="fw"></div>
+<header>
+<div class="logo"><span class="d"></span>GPT-Image-2 <span class="t">测试台</span><span class="v">v4</span></div>
+<div class="gsw" id="gsw"><button data-g="azure" class="on">gpt-azure</button><button data-g="count">gpt-image</button></div>
+</header>
+<div class="P"><div class="pt">API 配置<span class="r" id="ep"></span></div><div class="kr"><input type="password" id="key" placeholder="API Key..." autocomplete="off"><button class="btn bs" onclick="toggleKey()">显示</button><button class="btn bg" onclick="clearKey()">清除</button></div><div class="meta" id="gm"></div></div>
+<div class="tabs"><button class="tab on" onclick="sw('t',this)">文生图</button><button class="tab" onclick="sw('e',this)">图生图</button><button class="tab" onclick="sw('b',this)">批量</button></div>
+<div class="lay">
+<div>
+<div id="mp-t" class="mp on"><div class="P">
+<div class="pt">参数<span class="r"><button class="btn bg" onclick="savePreset()">+ 保存预设</button></span></div>
+<div class="pr" id="presets"></div>
+<label>模板</label><div class="tg" id="tpls"></div>
+<label>提示词</label><div class="tt" id="trtgl" onclick="toggleTr()">🌐 中→英</div>
+<textarea id="tp" placeholder="描述图片..."></textarea>
+<div class="row3"><div><label>尺寸</label><select id="ts" onchange="upH()"><option value="1024x1024">1024²</option><option value="1536x1024">1536×1024</option><option value="1024x1536">1024×1536</option><option value="1920x1088">1920×1088 (≈16:9)</option><option value="1088x1920">1088×1920 (≈9:16)</option><option value="2048x2048">2048²</option><option value="4096x4096">4096² ⚠️</option></select></div><div><label>质量</label><select id="tq" onchange="upH()"><option value="auto">Auto</option><option value="low">Low</option><option value="medium" selected>Medium</option><option value="high">High</option></select></div><div><label>张数</label><input type="number" id="tn" min="1" max="4" value="1" onchange="upH()"></div></div>
+<div id="ph" class="ht i"></div><div id="rh" style="display:none"></div>
+<button class="btn bp" id="gbtn" onclick="doGen()">⚡ 生成</button>
+</div></div>
+<div id="mp-e" class="mp"><div class="P">
+<div class="pt">图生图</div>
+<label>原图</label><div class="ua" id="idrop" onclick="$('iu').click()"><div>📎 上传图片</div><input type="file" id="iu" accept="image/*" onchange="hUp(this,'i')"><div class="upw" id="ipw" style="display:none"><img id="ipv"><button class="rm" onclick="rmU(event,'i')">×</button></div></div>
+<label>蒙版（可选）</label><div class="ua" id="mdrop" onclick="$('mu').click()"><div>🎭 上传蒙版</div><input type="file" id="mu" accept="image/png" onchange="hUp(this,'m')"><div class="upw" id="mpw" style="display:none"><img id="mpv"><button class="rm" onclick="rmU(event,'m')">×</button></div></div>
+<label>编辑指令</label><textarea id="ep2" placeholder="描述修改..."></textarea>
+<div class="row3"><div><label>尺寸</label><select id="es"><option value="auto">Auto</option><option value="1024x1024">1024²</option><option value="1536x1024">1536w</option><option value="1024x1536">1024h</option></select></div><div><label>质量</label><select id="eq"><option value="auto">Auto</option><option value="low">Low</option><option value="medium" selected>Med</option><option value="high">High</option></select></div><div><label>张数</label><input type="number" id="en" min="1" max="4" value="1"></div></div>
+<button class="btn bp" id="ebtn" onclick="doEdit()">✏️ 编辑</button>
+</div></div>
+<div id="mp-b" class="mp"><div class="P">
+<div class="pt">批量队列<span class="r" id="bstat"></span></div>
+<label>每行一个 Prompt</label><textarea id="binp" placeholder="第一张...\n第二张...\n第三张..." style="min-height:90px"></textarea>
+<div class="row"><div><label>尺寸</label><select id="bsz"><option value="1024x1024">1024²</option><option value="1536x1024">1536w</option><option value="1024x1536">1024h</option></select></div><div><label>质量</label><select id="bql"><option value="medium" selected>Med</option><option value="low">Low</option><option value="high">High</option></select></div></div>
+<div class="bl" id="blist"></div>
+<div style="display:flex;gap:6px"><button class="btn bp" id="bbtn" onclick="startBatch()" style="flex:1">▶ 开始</button><button class="btn bs" onclick="stopBatch()" style="width:auto;padding:9px 12px">⏹</button></div>
+</div></div>
+</div>
+<div>
+<div class="op" id="opnl">
+<div class="pt">生成结果<span class="r" id="ri"></span></div>
+<div id="oph" class="oph"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg><p>填写提示词并点击生成</p></div>
+<div id="lsp" class="sp"><div class="sr"></div><span id="ltx">生成中...</span><span class="tm" id="tmr">0.0s</span></div>
+<div id="ra"></div>
+<div id="sbar" class="sb"></div><div id="cdisp" class="cd"></div>
+</div>
+<div class="hs"><div class="P">
+<div class="pt"><span>历史记录</span><div style="display:flex;gap:5px"><button class="btn bg" onclick="exportZip()">📦 ZIP</button><button class="btn bg" onclick="filterFav()">⭐</button><button class="btn bg" onclick="clearHist()">清空</button></div></div>
+<div id="hgrid" class="hg"><div class="he">暂无记录</div></div>
+</div></div>
+</div>
+</div>
+</div>
+<div class="lb" id="lb" onclick="closeLB(event)"><button class="cl" onclick="closeLB(event)">×</button><img id="lbi" alt=""><div class="la"><button onclick="dlCur()">⬇ 下载</button><button onclick="cpCur()">📋 复制</button></div></div>
+<script>
+'use strict';
+const GROUPS={azure:{model:'gpt-image-2',endpoint:'https://deepkey.top',desc:'官方·按token·倍率1.2×'},count:{model:'gpt-image-2-count',endpoint:'https://deepkey.top',desc:'按次¥0.1/张·4K有卡图风险'}};
+const TEMPLATES=[
+{name:'赛博朋克',p:'cyberpunk city street at night, neon lights, rain reflections, cinematic'},
+{name:'水彩风景',p:'watercolor painting of a serene mountain lake at sunrise, soft colors'},
+{name:'3D角色',p:'3D rendered cute character, Pixar style, soft lighting, white background'},
+{name:'产品摄影',p:'product photography, minimalist, soft shadows, white background, studio lighting'},
+{name:'油画肖像',p:'oil painting portrait, Renaissance style, dramatic lighting, rich colors'},
+{name:'动漫风',p:'anime style illustration, vibrant colors, detailed background, Studio Ghibli inspired'},
+{name:'扁平插画',p:'flat design illustration, geometric shapes, bold colors, modern minimal'},
+{name:'照片写实',p:'photorealistic, 8K, ultra detailed, natural lighting, shallow depth of field'}
+];
+let CG=localStorage.getItem('gi2_g')||'azure',curMode='t',uploadI=null,uploadM=null,timerH=null,batchRunning=false,batchStop=false,lbSrc='',showFavOnly=false,translateOn=false;
+const MAX_RETRY=3,RETRY_DELAY=2000;
+const $=id=>document.getElementById(id);
+const show=(el,on)=>{if(typeof el==='string')el=$(el);el.style.display=on?'block':'none'};
+function sw(mode,el){curMode=mode;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.mp').forEach(p=>p.classList.remove('on'));$('mp-'+mode).classList.add('on')}
+function toggleKey(){const i=$('key');i.type=i.type==='password'?'text':'password'}
+function clearKey(){localStorage.removeItem('gi2_k_'+CG);$('key').value=''}
+function applyGroup(g){CG=g;localStorage.setItem('gi2_g',g);document.querySelectorAll('#gsw button').forEach(b=>b.classList.toggle('on',b.dataset.g===g));const c=GROUPS[g];$('ep').textContent=c.model;$('gm').innerHTML='端点: <code>'+getBase()+'</code> · '+c.desc;$('key').value=localStorage.getItem('gi2_k_'+g)||'';upH()}
+$('key').addEventListener('input',e=>localStorage.setItem('gi2_k_'+CG,e.target.value));
+document.querySelectorAll('#gsw button').forEach(b=>b.addEventListener('click',()=>applyGroup(b.dataset.g)));
+function getBase(){if(typeof ENV!=='undefined'&&ENV.proxy)return'';return GROUPS[CG].endpoint}
+let ENV={proxy:false};
+async function probeProxy(){try{const r=await fetch('/__proxy_health');if(r.ok){ENV.proxy=true}}catch{}}
+function detectEnv(){if(location.protocol==='file:'){$('fw').style.display='block';$('fw').innerHTML='<strong>⚠️ file:// 模式</strong> — 双击 <code>启动.bat</code> 通过本地代理访问。'}}
+function upH(){const s=$('ts').value,q=$('tq').value,n=+$('tn').value||1,h=$('ph'),rh=$('rh');
+if(CG==='count'){h.textContent='💰 ¥'+(0.1*n).toFixed(2)+'（按次）';h.className='ht w'}
+else{const f={'1024x1024':1,'1536x1024':1.5,'1024x1536':1.5,'2048x2048':4,'4096x4096':16}[s]||1;const qf={low:.4,medium:1,high:2.5,auto:1}[q]||1;const b=0.05*f*qf*1.2;h.textContent='💰 ≈¥'+(b*.7*n).toFixed(3)+'–'+(b*1.5*n).toFixed(3);h.className='ht i'}
+if(s==='4096x4096'){rh.style.display='block';rh.className=CG==='count'?'ht d':'ht w';rh.textContent=CG==='count'?'🚫 count分组4K极易卡图！':'⚠️ 4K约¥0.5/张，耗时30s+'}else{rh.style.display='none'}}
+function hUp(inp,t){const f=inp.files[0];if(!f)return;if(t==='i')uploadI=f;else uploadM=f;const r=new FileReader();r.onload=e=>{$(t==='i'?'ipv':'mpv').src=e.target.result;$(t==='i'?'ipw':'mpw').style.display='inline-block'};r.readAsDataURL(f)}
+function rmU(ev,t){ev.stopPropagation();if(t==='i'){uploadI=null;$('iu').value='';$('ipw').style.display='none'}else{uploadM=null;$('mu').value='';$('mpw').style.display='none'}}
+['idrop','mdrop'].forEach(id=>{const el=$(id);el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag')});el.addEventListener('dragleave',()=>el.classList.remove('drag'));el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag');const f=e.dataTransfer.files[0];if(!f)return;if(id==='mdrop'){uploadM=f;const r=new FileReader();r.onload=ev=>{$('mpv').src=ev.target.result;$('mpw').style.display='inline-block'};r.readAsDataURL(f)}else{uploadI=f;const r=new FileReader();r.onload=ev=>{$('ipv').src=ev.target.result;$('ipw').style.display='inline-block'};r.readAsDataURL(f)}})});
+function setLoad(on,msg){$('oph').style.display=on?'none':'flex';$('lsp').style.display=on?'flex':'none';$('ra').style.display='none';$('sbar').style.display='none';$('cdisp').innerHTML='';if(on){$('ltx').textContent=msg||'生成中...';startTm()}else stopTm()}
+function startTm(){const s=Date.now();stopTm();timerH=setInterval(()=>{$('tmr').textContent=((Date.now()-s)/1000).toFixed(1)+'s'},100)}
+function stopTm(){if(timerH){clearInterval(timerH);timerH=null}}
+function showSt(m,t){const b=$('sbar');b.textContent=m;b.className='sb '+t;b.style.display='block'}
+function showCost(u){if(!u)return;const d=$('cdisp');let h='';if(u.input_tokens!=null)h+='<span class="cc">入'+u.input_tokens+'</span>';if(u.output_tokens!=null)h+='<span class="cc">出'+u.output_tokens+'</span>';if(u.total_tokens!=null)h+='<span class="cc">计'+u.total_tokens+'</span>';d.innerHTML=h}
+async function apiCall(path,opts,retry=0){const key=$('key').value.trim();if(!key)throw new Error('请填写 API Key');
+const base=getBase();const url=base+path;
+try{const r=await fetch(url,opts);const txt=await r.text();let d;try{d=JSON.parse(txt)}catch{d={error:{message:txt}}}
+if(!r.ok){const msg=d?.error?.message||d?.message||txt.slice(0,200);if(retry<MAX_RETRY&&(r.status>=500||r.status===429)){$('ri').textContent='重试 '+(retry+1)+'/'+MAX_RETRY;await new Promise(r=>setTimeout(r,RETRY_DELAY*(retry+1)));return apiCall(path,opts,retry+1)}
+throw new Error('错误 '+r.status+'：'+msg)}
+return d}catch(e){if(e.message.startsWith('错误'))throw e;
+if(retry<MAX_RETRY&&/fetch|network|timeout/i.test(e.message)){$('ri').textContent='重试 '+(retry+1)+'/'+MAX_RETRY;await new Promise(r=>setTimeout(r,RETRY_DELAY*(retry+1)));return apiCall(path,opts,retry+1)}
+if(location.protocol==='file:')throw new Error('file://模式无法请求API，请用启动.bat');
+throw e}}
+async function doGen(){let prompt=$('tp').value.trim();if(!prompt)return showSt('请输入提示词','err');
+const size=$('ts').value,quality=$('tq').value,n=+$('tn').value||1;
+if(size==='4096x4096'&&CG==='count'&&!confirm('count分组4K极易卡图，确定？'))return;
+if(translateOn)prompt=await translatePrompt(prompt);
+setLoad(true,'生成 '+n+' 张...');$('gbtn').disabled=true;$('ri').textContent='';
+try{const key=$('key').value.trim();const d=await apiCall('/v1/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:GROUPS[CG].model,prompt,n,size,quality})});
+const items=(d.data||[]).map(x=>x.b64_json?'data:image/png;base64,'+x.b64_json:x.url).filter(Boolean);
+if(!items.length)throw new Error('响应无图片');
+renderResult(items);items.forEach(src=>saveHist({src,prompt,mode:'txt',group:CG,model:GROUPS[CG].model,size,quality,ts:Date.now()}));
+if(d.usage)showCost(d.usage);$('ri').textContent=''}catch(e){setLoad(false);show('oph',true);showSt(e.message,'err')}finally{$('gbtn').disabled=false;stopTm()}}
+async function doEdit(){let prompt=$('ep2').value.trim();if(!prompt)return showSt('请输入编辑指令','err');if(!uploadI)return showSt('请上传原图','err');
+const size=$('es').value,quality=$('eq').value,n=+$('en').value||1;
+if(translateOn)prompt=await translatePrompt(prompt);
+setLoad(true,'编辑中...');$('ebtn').disabled=true;$('ri').textContent='';
+try{const key=$('key').value.trim();if(!key)throw new Error('请填写 API Key');
+const fd=new FormData();fd.append('model',GROUPS[CG].model);fd.append('image',uploadI);if(uploadM)fd.append('mask',uploadM);fd.append('prompt',prompt);fd.append('n',String(n));if(size!=='auto')fd.append('size',size);if(quality!=='auto')fd.append('quality',quality);
+const d=await apiCall('/v1/images/edits',{method:'POST',headers:{'Authorization':'Bearer '+key},body:fd});
+const items=(d.data||[]).map(x=>x.b64_json?'data:image/png;base64,'+x.b64_json:x.url).filter(Boolean);
+if(!items.length)throw new Error('响应无图片');
+renderResult(items);items.forEach(src=>saveHist({src,prompt,mode:'edit',group:CG,model:GROUPS[CG].model,size,quality,ts:Date.now()}));
+if(d.usage)showCost(d.usage);$('ri').textContent=''}catch(e){setLoad(false);show('oph',true);showSt(e.message,'err')}finally{$('ebtn').disabled=false;stopTm()}}
+function renderResult(items){show('oph',false);$('lsp').style.display='none';$('ra').style.display='block';
+const ra=$('ra');ra.innerHTML='';items.forEach((src,i)=>{const w=document.createElement('div');w.className='riw';
+const img=document.createElement('img');img.src=src;img.onclick=()=>openLB(src);w.appendChild(img);
+const acts=document.createElement('div');acts.className='ac';
+const dlBtn=document.createElement('button');dlBtn.textContent='下载';dlBtn.onclick=()=>dlImg(src,i);acts.appendChild(dlBtn);
+const cpBtn=document.createElement('button');cpBtn.textContent='复制';cpBtn.onclick=()=>cpImg(src);acts.appendChild(cpBtn);
+w.appendChild(acts);ra.appendChild(w)});refreshHist()}
+async function startBatch(){const lines=$('binp').value.trim().split('\n').filter(l=>l.trim());if(!lines.length)return showSt('请输入至少一行prompt','err');
+batchRunning=true;batchStop=false;$('bbtn').disabled=true;const size=$('bsz').value,quality=$('bql').value;
+const list=$('blist');list.innerHTML='';lines.forEach((l,i)=>{const d=document.createElement('div');d.className='bi';d.id='bi-'+i;d.innerHTML='<span class="bt">'+l.slice(0,50)+'</span><span class="bst p">等待</span>';list.appendChild(d)});
+for(let i=0;i<lines.length;i++){if(batchStop)break;const el=$('bi-'+i);if(!el)continue;el.querySelector('.bst').className='bst r';el.querySelector('.bst').textContent='生成中';$('bstat').textContent=(i+1)+'/'+lines.length;
+try{const key=$('key').value.trim();const d=await apiCall('/v1/images/generations',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:GROUPS[CG].model,prompt:lines[i].trim(),n:1,size,quality})});
+const src=(d.data||[]).map(x=>x.b64_json?'data:image/png;base64,'+x.b64_json:x.url).filter(Boolean)[0];
+if(src){el.querySelector('.bst').className='bst d';el.querySelector('.bst').textContent='完成';saveHist({src,prompt:lines[i].trim(),mode:'batch',group:CG,model:GROUPS[CG].model,size,quality,ts:Date.now()});renderResult([src])}
+else{el.querySelector('.bst').className='bst f';el.querySelector('.bst').textContent='无图'}}
+catch(e){el.querySelector('.bst').className='bst f';el.querySelector('.bst').textContent='失败'}}
+batchRunning=false;$('bbtn').disabled=false;$('bstat').textContent='完成';refreshHist()}
+function stopBatch(){batchStop=true;$('bstat').textContent='已停止'}
+// === IndexedDB ===
+const DB='gi2_h4',ST='imgs';let dbP=null;
+function odb(){if(dbP)return dbP;dbP=new Promise((ok,no)=>{const r=indexedDB.open(DB,1);r.onupgradeneeded=e=>{const db=e.target.result;if(!db.objectStoreNames.contains(ST)){const s=db.createObjectStore(ST,{keyPath:'id',autoIncrement:true});s.createIndex('ts','ts')}};r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});return dbP}
+async function saveHist(rec){try{const db=await odb();await new Promise(ok=>{const tx=db.transaction(ST,'readwrite');tx.objectStore(ST).add(rec);tx.oncomplete=ok;tx.onerror=ok})}catch{}}
+async function listHist(lim=80){try{const db=await odb();return new Promise(ok=>{const l=[];const tx=db.transaction(ST,'readonly');const c=tx.objectStore(ST).index('ts').openCursor(null,'prev');c.onsuccess=e=>{const cur=e.target.result;if(cur&&l.length<lim){l.push(cur.value);cur.continue()}else ok(l)};c.onerror=()=>ok([])})}catch{return[]}}
+async function delHist(id){const db=await odb();await new Promise(ok=>{const tx=db.transaction(ST,'readwrite');tx.objectStore(ST).delete(id);tx.oncomplete=ok;tx.onerror=ok})}
+async function toggleFav(id){const db=await odb();const tx=db.transaction(ST,'readwrite');const s=tx.objectStore(ST);const r=s.get(id);r.onsuccess=()=>{const rec=r.result;if(rec){rec.fav=!rec.fav;s.put(rec)}};await new Promise(ok=>{tx.oncomplete=ok});refreshHist()}
+async function clearHist(){if(!confirm('清空所有历史？'))return;const db=await odb();await new Promise(ok=>{const tx=db.transaction(ST,'readwrite');tx.objectStore(ST).clear();tx.oncomplete=ok});refreshHist()}
+async function refreshHist(){const list=await listHist();const g=$('hgrid');const filtered=showFavOnly?list.filter(x=>x.fav):list;
+if(!filtered.length){g.innerHTML='<div class="he">'+(showFavOnly?'无收藏':'暂无记录')+'</div>';return}
+g.innerHTML='';filtered.forEach(it=>{const d=document.createElement('div');d.className='hi';
+const img=document.createElement('img');img.src=it.src;img.loading='lazy';d.appendChild(img);
+d.insertAdjacentHTML('beforeend','<button class="fv'+(it.fav?' on':'')+'">'+(it.fav?'★':'☆')+'</button><button class="dl">×</button><button class="hdl">⬇</button><button class="hpv">👁</button><div class="ho"><div>'+(it.size||'')+'</div><div>'+(it.prompt||'').slice(0,30)+'</div></div>');
+d.querySelector('.fv').onclick=ev=>{ev.stopPropagation();toggleFav(it.id)};
+d.querySelector('.dl').onclick=ev=>{ev.stopPropagation();delHist(it.id).then(refreshHist)};
+d.querySelector('.hdl').onclick=ev=>{ev.stopPropagation();dlImg(it.src,it.id)};
+d.querySelector('.hpv').onclick=ev=>{ev.stopPropagation();openLB(it.src);$('tp').value=it.prompt||''};
+g.appendChild(d)})}
+function filterFav(){showFavOnly=!showFavOnly;refreshHist()}
+// === ZIP 导出（简易 store 方式，无压缩，纯离线） ===
+async function exportZip(){const list=await listHist(200);if(!list.length)return showSt('无历史可导出','inf');
+showSt('正在打包...','inf');
+const files=[];for(let i=0;i<list.length;i++){const it=list[i];let blob;if(it.src.startsWith('data:')){blob=await(await fetch(it.src)).blob()}else{try{blob=await(await fetch(it.src)).blob()}catch{continue}}
+files.push({name:'img_'+(i+1)+'.png',data:new Uint8Array(await blob.arrayBuffer())})}
+const zip=buildZip(files);const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([zip],{type:'application/zip'}));a.download='gpt-images-'+Date.now()+'.zip';a.click();showSt('✅ 已导出 '+files.length+' 张','ok')}
+function buildZip(files){const enc=new TextEncoder();let offset=0;const central=[];const local=[];
+function crc32(buf){let c=0xFFFFFFFF;for(let i=0;i<buf.length;i++){c^=buf[i];for(let j=0;j<8;j++)c=(c>>>1)^(c&1?0xEDB88320:0)}return(c^0xFFFFFFFF)>>>0}
+files.forEach(f=>{const name=enc.encode(f.name);const crc=crc32(f.data);
+const h=new Uint8Array(30+name.length);const v=new DataView(h.buffer);v.setUint32(0,0x04034b50,true);v.setUint16(4,20,true);v.setUint16(8,0,true);v.setUint32(14,crc,true);v.setUint32(18,f.data.length,true);v.setUint32(22,f.data.length,true);v.setUint16(26,name.length,true);h.set(name,30);
+local.push(h,f.data);
+const ch=new Uint8Array(46+name.length);const cv=new DataView(ch.buffer);cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(10,0,true);cv.setUint32(16,crc,true);cv.setUint32(20,f.data.length,true);cv.setUint32(24,f.data.length,true);cv.setUint16(28,name.length,true);cv.setUint32(42,offset,true);ch.set(name,46);
+central.push(ch);offset+=30+name.length+f.data.length});
+const cOff=offset;let cSize=0;central.forEach(c=>cSize+=c.length);
+const end=new Uint8Array(22);const ev=new DataView(end.buffer);ev.setUint32(0,0x06054b50,true);ev.setUint16(8,files.length,true);ev.setUint16(10,files.length,true);ev.setUint32(12,cSize,true);ev.setUint32(16,cOff,true);
+const parts=[...local,...central,end];let total=0;parts.forEach(p=>total+=p.length);const out=new Uint8Array(total);let pos=0;parts.forEach(p=>{out.set(p,pos);pos+=p.length});return out}
+// === Lightbox ===
+function openLB(src){lbSrc=src;const img=$('lbi');const lb=$('lb');img.src='';lb.classList.add('show');setTimeout(()=>{img.src=src},50)}
+function closeLB(ev){if(ev.target.id==='lb'||ev.target.className==='cl')$('lb').classList.remove('show')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('lb').classList.remove('show')});
+function dlCur(){dlImg(lbSrc,0)}function cpCur(){cpImg(lbSrc)}
+function dlImg(src,i){const a=document.createElement('a');a.href=src;a.download='gpt-img-'+Date.now()+'-'+i+'.png';document.body.appendChild(a);a.click();a.remove()}
+async function cpImg(src){try{if(src.startsWith('data:')){const b=await(await fetch(src)).blob();await navigator.clipboard.write([new ClipboardItem({[b.type]:b})])}else{await navigator.clipboard.writeText(src)}showSt('✅ 已复制','ok')}catch(e){showSt('复制失败','err')}}
+// === 预设 ===
+function getPresets(){try{return JSON.parse(localStorage.getItem('gi2_presets')||'[]')}catch{return[]}}
+function savePreset(){const name=prompt('预设名称：');if(!name)return;const ps=getPresets();ps.push({name,size:$('ts').value,quality:$('tq').value,n:+$('tn').value,group:CG});localStorage.setItem('gi2_presets',JSON.stringify(ps));renderPresets()}
+function renderPresets(){const ps=getPresets();const el=$('presets');el.innerHTML='';ps.forEach((p,i)=>{const b=document.createElement('button');b.className='pc';b.textContent=p.name;b.onclick=()=>{$('ts').value=p.size;$('tq').value=p.quality;$('tn').value=p.n;if(p.group)applyGroup(p.group);upH()};b.oncontextmenu=e=>{e.preventDefault();if(confirm('删除预设 "'+p.name+'"？')){ps.splice(i,1);localStorage.setItem('gi2_presets',JSON.stringify(ps));renderPresets()}};el.appendChild(b)})}
+// === 模板 ===
+function renderTpls(){const el=$('tpls');el.innerHTML='';TEMPLATES.forEach(t=>{const d=document.createElement('div');d.className='ti';d.innerHTML='<div class="tn">'+t.name+'</div><div>'+t.p.slice(0,40)+'...</div>';d.onclick=()=>{$('tp').value=t.p};el.appendChild(d)})}
+// === 翻译 ===
+function toggleTr(){translateOn=!translateOn;$('trtgl').classList.toggle('on',translateOn)}
+async function translatePrompt(text){if(!/[一-鿿]/.test(text))return text;
+try{const key=$('key').value.trim();const r=await fetch(getBase()+'/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},body:JSON.stringify({model:'gpt-4o-mini',messages:[{role:'user',content:'Translate to English for image generation (output ONLY the translation, nothing else): '+text}],max_tokens:200})});
+const d=await r.json();return d?.choices?.[0]?.message?.content?.trim()||text}catch{return text}}
+// === 初始化 ===
+window.addEventListener('DOMContentLoaded',async()=>{detectEnv();applyGroup(CG);renderPresets();renderTpls();upH();await probeProxy();applyGroup(CG);refreshHist()});
+</script>
+</body></html>
