@@ -15,6 +15,7 @@ const https = require('https');
 const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
+const crypto = require('crypto');
 
 // ========== 配置 ==========
 const PORT = parseInt(process.argv[2]) || 3000;
@@ -24,6 +25,14 @@ const TARGETS = {
   default: 'https://deepkey.top',
 };
 const ROOT = __dirname;
+const HIST_DIR = path.join(ROOT, 'history');
+const HIST_IMG_DIR = path.join(HIST_DIR, 'images');
+const HIST_META = path.join(HIST_DIR, 'meta.json');
+try { fs.mkdirSync(HIST_IMG_DIR, { recursive: true }); } catch {}
+function loadMeta() {
+  try { return JSON.parse(fs.readFileSync(HIST_META, 'utf8')); } catch { return { items: [], nextId: 1 }; }
+}
+function saveMeta(m) { fs.writeFileSync(HIST_META, JSON.stringify(m, null, 0)); }
 
 // ========== MIME ==========
 const MIME = {
@@ -152,6 +161,153 @@ function proxyApi(req, res) {
   });
 }
 
+// ========== 历史记录 API ==========
+function readJson(req) {
+  return new Promise((ok, no) => {
+    const chunks = [];
+    req.on('data', c => chunks.push(c));
+    req.on('end', () => {
+      try { ok(JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}')); }
+      catch (e) { no(e); }
+    });
+    req.on('error', no);
+  });
+}
+function jsonRes(res, code, data) {
+  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
+  res.end(JSON.stringify(data));
+}
+async function handleHistory(req, res) {
+  try {
+    const u = new URL(req.url, 'http://localhost');
+    const route = u.pathname; // /__history , /__history/save , /__history/:id , /__history/clear
+    // GET /__history → 列出全部
+    if (route === '/__history' && req.method === 'GET') {
+      const m = loadMeta();
+      // 按 ts 倒序
+      const items = m.items.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0));
+      return jsonRes(res, 200, { items });
+    }
+    // POST /__history/save  body: { src(dataURL或URL), prompt, mode, group, model, size, quality, ts, session, nodeId, parentId, fav }
+    if (route === '/__history/save' && req.method === 'POST') {
+      const body = await readJson(req);
+      if (!body.src) return jsonRes(res, 400, { error: 'src required' });
+      const m = loadMeta();
+      const id = m.nextId++;
+      // 把 base64 落盘
+      let storedSrc = body.src;
+      const match = /^data:image\/(\w+);base64,(.+)$/.exec(body.src);
+      if (match) {
+        const ext = match[1].toLowerCase() === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+        const buf = Buffer.from(match[2], 'base64');
+        const hash = crypto.createHash('sha1').update(buf).digest('hex').slice(0, 12);
+        const fname = `${Date.now()}_${id}_${hash}.${ext}`;
+        const fpath = path.join(HIST_IMG_DIR, fname);
+        fs.writeFileSync(fpath, buf);
+        storedSrc = '/history/images/' + fname;
+      }
+      const rec = {
+        id, src: storedSrc,
+        prompt: body.prompt || '', mode: body.mode || '',
+        group: body.group || '', model: body.model || '',
+        size: body.size || '', quality: body.quality || '',
+        ts: body.ts || Date.now(),
+        session: body.session || null,
+        nodeId: body.nodeId || null,
+        parentId: body.parentId || null,
+        fav: !!body.fav,
+      };
+      m.items.push(rec);
+      saveMeta(m);
+      return jsonRes(res, 200, { ok: true, item: rec });
+    }
+    // PATCH /__history/:id  body: { fav?, prompt? }
+    const idMatch = /^\/__history\/(\d+)$/.exec(route);
+    if (idMatch && req.method === 'PATCH') {
+      const id = parseInt(idMatch[1]);
+      const body = await readJson(req);
+      const m = loadMeta();
+      const item = m.items.find(x => x.id === id);
+      if (!item) return jsonRes(res, 404, { error: 'not found' });
+      if (typeof body.fav === 'boolean') item.fav = body.fav;
+      if (typeof body.prompt === 'string') item.prompt = body.prompt;
+      saveMeta(m);
+      return jsonRes(res, 200, { ok: true, item });
+    }
+    // DELETE /__history/:id
+    if (idMatch && req.method === 'DELETE') {
+      const id = parseInt(idMatch[1]);
+      const m = loadMeta();
+      const idx = m.items.findIndex(x => x.id === id);
+      if (idx < 0) return jsonRes(res, 404, { error: 'not found' });
+      const item = m.items[idx];
+      m.items.splice(idx, 1);
+      saveMeta(m);
+      // 删图片文件
+      if (item.src && item.src.startsWith('/history/images/')) {
+        const fpath = path.join(ROOT, item.src.replace(/^\//, ''));
+        try { fs.unlinkSync(fpath); } catch {}
+      }
+      return jsonRes(res, 200, { ok: true });
+    }
+    // POST /__history/clear  body: { session? }  指定 session 则只清那个会话
+    if (route === '/__history/clear' && req.method === 'POST') {
+      const body = await readJson(req).catch(() => ({}));
+      const m = loadMeta();
+      const keep = [];
+      const remove = [];
+      m.items.forEach(it => { if (body.session && it.session !== body.session) keep.push(it); else remove.push(it); });
+      m.items = keep;
+      saveMeta(m);
+      remove.forEach(it => {
+        if (it.src && it.src.startsWith('/history/images/')) {
+          const fpath = path.join(ROOT, it.src.replace(/^\//, ''));
+          try { fs.unlinkSync(fpath); } catch {}
+        }
+      });
+      return jsonRes(res, 200, { ok: true, removed: remove.length });
+    }
+    // POST /__history/import  body: { items: [...] }  一次性导入（用于从浏览器 IndexedDB 迁移）
+    if (route === '/__history/import' && req.method === 'POST') {
+      const body = await readJson(req);
+      if (!Array.isArray(body.items)) return jsonRes(res, 400, { error: 'items array required' });
+      const m = loadMeta();
+      let imported = 0;
+      for (const it of body.items) {
+        if (!it.src) continue;
+        const id = m.nextId++;
+        let storedSrc = it.src;
+        const match = /^data:image\/(\w+);base64,(.+)$/.exec(it.src);
+        if (match) {
+          const ext = match[1].toLowerCase() === 'jpeg' ? 'jpg' : match[1].toLowerCase();
+          const buf = Buffer.from(match[2], 'base64');
+          const hash = crypto.createHash('sha1').update(buf).digest('hex').slice(0, 12);
+          const fname = `${it.ts || Date.now()}_${id}_${hash}.${ext}`;
+          fs.writeFileSync(path.join(HIST_IMG_DIR, fname), buf);
+          storedSrc = '/history/images/' + fname;
+        }
+        m.items.push({
+          id, src: storedSrc,
+          prompt: it.prompt || '', mode: it.mode || '',
+          group: it.group || '', model: it.model || '',
+          size: it.size || '', quality: it.quality || '',
+          ts: it.ts || Date.now(),
+          session: it.session || null,
+          nodeId: it.nodeId || null,
+          parentId: it.parentId || null,
+          fav: !!it.fav,
+        });
+        imported++;
+      }
+      saveMeta(m);
+      return jsonRes(res, 200, { ok: true, imported });
+    }
+    return jsonRes(res, 404, { error: 'unknown history route', path: route, method: req.method });
+  } catch (e) {
+    return jsonRes(res, 500, { error: e.message });
+  }
+}
+
 // ========== HTTP 入口 ==========
 const server = http.createServer((req, res) => {
   setCors(res);
@@ -165,7 +321,16 @@ const server = http.createServer((req, res) => {
   // 健康检查（HTML 启动时用来判断代理是否在线）
   if (req.url === '/__proxy_health') {
     res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    return res.end(JSON.stringify({ ok: true, target: TARGETS.default }));
+    return res.end(JSON.stringify({ ok: true, target: TARGETS.default, hasServerHistory: true }));
+  }
+
+  // 历史 API ==================================================
+  if (req.url.startsWith('/__history')) {
+    return handleHistory(req, res);
+  }
+  // 历史图片静态访问 /history/images/xxx.png
+  if (req.url.startsWith('/history/images/')) {
+    return serveStatic(req, res);
   }
 
   // /v1/* 走代理
